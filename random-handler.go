@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 )
 
@@ -14,6 +15,10 @@ func RandomHandlerConstructor(router *http.ServeMux) {
 
 func (handler *RandomHandler) Random() http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		fmt.Println("random")
+		num := rand.Intn(6) + 1
+		strInt := fmt.Sprintf("%d", num)
+
+		w.Write([]byte(strInt))
+		return
 	}
 }
