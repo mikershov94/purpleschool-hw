@@ -3,6 +3,7 @@ package auth
 import (
 	"fmt"
 	"go/adv-demo/configs"
+	"go/adv-demo/pkg/res"
 	"net/http"
 )
 
@@ -26,7 +27,10 @@ func (handler *AuthHandler) Login() http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		fmt.Println(handler.Config.Auth.Secret)
 		fmt.Println("login")
-		return
+		data := LoginResponse{
+			Token: "123",
+		}
+		res.Json(w, data, 200)
 	}
 }
 
