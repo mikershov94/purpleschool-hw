@@ -10,10 +10,17 @@ import (
 
 type Config struct {
 	Server ServerConfig
+	Email  EmailConfig
 }
 
 type ServerConfig struct {
 	Port int
+}
+
+type EmailConfig struct {
+	Email    string
+	Password string
+	Address  string
 }
 
 func LoadConfig() *Config {
@@ -30,6 +37,11 @@ func LoadConfig() *Config {
 	return &Config{
 		Server: ServerConfig{
 			Port: port,
+		},
+		Email: EmailConfig{
+			Email:    os.Getenv("EMAIL"),
+			Password: os.Getenv("PASSWORD"),
+			Address:  os.Getenv("ADDRESS"),
 		},
 	}
 }
