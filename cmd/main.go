@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"go/validation-api/configs"
+	"go/validation-api/internal/verify"
 	"net/http"
 )
 
@@ -10,6 +11,7 @@ func main() {
 	conf := configs.LoadConfig()
 
 	router := http.NewServeMux()
+	verify.NewVerifyHander(router)
 
 	port := conf.Server.Port
 	server := http.Server{
