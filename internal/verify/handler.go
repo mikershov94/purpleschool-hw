@@ -12,7 +12,7 @@ type VerifyHandler struct {
 	Config configs.EmailConfig
 }
 
-func NewVerifyHander(router *http.ServeMux, deps configs.EmailConfig) {
+func NewVerifyHandler(router *http.ServeMux, deps configs.EmailConfig) {
 	handler := &VerifyHandler{
 		Config: deps,
 	}
