@@ -1,6 +1,11 @@
 package verify
 
-import "net/http"
+import (
+	"net/http"
+	"net/smtp"
+
+	"github.com/jordan-wright/email"
+)
 
 type VerifyHandler struct{}
 
@@ -8,17 +13,28 @@ func NewVerifyHander(router *http.ServeMux) {
 	handler := &VerifyHandler{}
 
 	router.HandleFunc("POST /send", handler.Send())
-	router.HandleFunc("GET /verify", handler.Verify())
+	router.HandleFunc("GET /verify/{hash}", handler.Verify())
 }
 
 func (handler *VerifyHandler) Send() http.HandlerFunc {
 	return func(w http.ResponseWriter, req http.Request) {
-		w.Write({})
+		w.WriteHeader(200)
+
+		e := email.NewEmail()
+		e.From = "Jordan Wright <test@gmail.com>"
+		e.To = []string{"test@example.com"}
+		e.Bcc = []string{"test_bcc@example.com"}
+		e.Cc = []string{"test_cc@example.com"}
+		e.Subject = "Awesome Subject"
+		e.Text = []byte("Text Body is, of course, supported!")
+		e.HTML = []byte("<h1>Fancy HTML is supported, too!</h1>")
+		e.Send("smtp.gmail.com:587", smtp.PlainAuth("", "test@gmail.com", "password123", "smtp.gmail.com"))
+
 	}
 }
 
 func (handler *VerifyHandler) Verify() http.HandlerFunc {
 	return func(w http.ResponseWriter, req http.Request) {
-		w.Write({})
+		w.WriteHeader(200)
 	}
 }
