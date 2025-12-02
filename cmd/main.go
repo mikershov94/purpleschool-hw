@@ -11,7 +11,7 @@ func main() {
 	conf := configs.LoadConfig()
 
 	router := http.NewServeMux()
-	verify.NewVerifyHander(router)
+	verify.NewVerifyHander(router, conf.Email)
 
 	port := conf.Server.Port
 	server := http.Server{
