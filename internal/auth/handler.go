@@ -1,13 +1,9 @@
 package auth
 
 import (
-	"encoding/json"
 	"fmt"
 	"go/adv-demo/configs"
-	"go/adv-demo/pkg/res"
 	"net/http"
-
-	"github.com/go-playground/validator/v10"
 )
 
 type AuthHandlerDeps struct {
@@ -29,24 +25,6 @@ func AuthHandlerConstructor(router *http.ServeMux, deps AuthHandlerDeps) {
 func (handler *AuthHandler) Login() http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 
-		var payload LoginRequest
-		err := json.NewDecoder(req.Body).Decode(&payload)
-		if err != nil {
-			res.Json(w, err.Error(), 402)
-			return
-		}
-
-		validate := validator.New()
-		err = validate.Struct(payload)
-		if err != nil {
-			res.Json(w, err.Error(), 402)
-			return
-		}
-
-		data := LoginResponse{
-			Token: "123",
-		}
-		res.Json(w, data, 200)
 	}
 }
 
