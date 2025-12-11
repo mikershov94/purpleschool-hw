@@ -15,10 +15,10 @@ func main() {
 	})
 
 	server := http.Server{
-		Addr:    ":5000",
+		Addr:    ":8080",
 		Handler: router,
 	}
 
-	fmt.Println("Server is listening on port 5000")
+	fmt.Println("Server is listening on port 8080")
 	server.ListenAndServe()
 }
