@@ -3,6 +3,7 @@ package auth
 import (
 	"fmt"
 	"go/adv-demo/configs"
+	"go/adv-demo/pkg/req"
 	"net/http"
 )
 
@@ -23,14 +24,23 @@ func AuthHandlerConstructor(router *http.ServeMux, deps AuthHandlerDeps) {
 }
 
 func (handler *AuthHandler) Login() http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		body, err := req.HandleBody[LoginRequest](&w, r)
+		if err != nil {
+			return
+		}
 
+		fmt.Println(body)
 	}
 }
 
 func (handler *AuthHandler) Register() http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
-		fmt.Println("register")
-		return
+	return func(w http.ResponseWriter, r *http.Request) {
+		body, err := req.HandleBody[RegisterRequest](&w, r)
+		if err != nil {
+			return
+		}
+
+		fmt.Println(body)
 	}
 }
