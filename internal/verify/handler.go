@@ -2,12 +2,14 @@ package verify
 
 import (
 	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"go/validation-api/configs"
+	"go/validation-api/pkg/email"
 	"net/http"
-	"net/smtp"
-
-	"github.com/jordan-wright/email"
+	"os"
+	"strings"
 )
 
 type VerifyHandler struct {
@@ -28,22 +30,30 @@ func (handler *VerifyHandler) Send() http.HandlerFunc {
 		w.WriteHeader(201)
 
 		hash := sha256.Sum256([]byte(handler.Config.Email))
-		// fmt.Println()
-		// TODO
-		// хэш перевести в строку и вставить в HTML
+		hashString := hex.EncodeToString(hash[:])
 
-		e := email.NewEmail()
-		e.From = "<" + handler.Config.Email + ">"
-		e.To = []string{"<" + handler.Config.Email + ">"}
-		e.Subject = "Michael Ershov"
-		e.Text = []byte("Text Body is, of course, supported!")
-		e.HTML = []byte(fmt.Sprintf(`<a href="http://localhost:3000/verify/%x">http://localhost:3000/verify/</a>`, hash))
-		err := e.Send(handler.Config.Address + ":587", smtp.PlainAuth("", handler.Config.Email, handler.Config.Password, handler.Config.Address))
+		err := email.SendLink(handler.Config, hashString)
 		if err != nil {
 			fmt.Println("Не удалось отправить письмо")
 			fmt.Println(err)
 			return
 		}
+
+		data := VerifyData{
+			Email: handler.Config.Email,
+			Hash: hashString,
+		}
+		jsonData, err := json.Marshal(data)
+		if err != nil {
+			fmt.Println("Ошибка при маршалинге данных")
+			return
+		}
+		err = os.WriteFile("verify_data.json", jsonData, 0644)
+		if err != nil {
+			fmt.Println("Ошибка при создании файла")
+			return
+		}
+
 
 		fmt.Println("Письмо отправлено")
 	}
@@ -51,6 +61,16 @@ func (handler *VerifyHandler) Send() http.HandlerFunc {
 
 func (handler *VerifyHandler) Verify() http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
+
+		hash := sha256.Sum256([]byte(handler.Config.Email))
+		hashString := hex.EncodeToString(hash[:])
+		target := strings.Replace(req.URL.Path, "/verify/", "", 1)
+
+		if !email.HashIsValid(hashString, target) {
+			fmt.Println("Ошибка верификации")
+			return
+		}
+
 		w.WriteHeader(200)
 		fmt.Println("Перешел по ссылке")
 	}
