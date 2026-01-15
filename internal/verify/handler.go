@@ -62,11 +62,16 @@ func (handler *VerifyHandler) Send() http.HandlerFunc {
 func (handler *VerifyHandler) Verify() http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 
-		hash := sha256.Sum256([]byte(handler.Config.Email))
-		hashString := hex.EncodeToString(hash[:])
+		filename := "verify_data.json"
+		verifyData, err := ReadVerifyData(filename)
+		if err != nil {
+			fmt.Println("Ошибка при чтении файла:", err)
+			return
+		}
+
 		target := strings.Replace(req.URL.Path, "/verify/", "", 1)
 
-		if !email.HashIsValid(hashString, target) {
+		if !email.HashIsValid(verifyData.Hash, target) {
 			fmt.Println("Ошибка верификации")
 			return
 		}
