@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"go/validation-api/configs"
 	"go/validation-api/pkg/email"
+	"go/validation-api/pkg/req"
 	"net/http"
 	"os"
 	"strings"
@@ -26,19 +27,22 @@ func NewVerifyHandler(router *http.ServeMux, deps configs.EmailConfig) {
 }
 
 func (handler *VerifyHandler) Send() http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
-		w.WriteHeader(201)
-
-		hash := sha256.Sum256([]byte(handler.Config.Email))
+	return func(w http.ResponseWriter, r *http.Request) {
+		body, err := req.HandleBody[SendRequest](&w, r)
+		if err != nil {
+			return 
+		}
+		
+		hash := sha256.Sum256([]byte(body.Email))
 		hashString := hex.EncodeToString(hash[:])
-
-		err := email.SendLink(handler.Config, hashString)
+		
+		err = email.SendLink(handler.Config, body.Email, hashString)
 		if err != nil {
 			fmt.Println("Не удалось отправить письмо")
 			fmt.Println(err)
 			return
 		}
-
+		
 		data := VerifyData{
 			Email: handler.Config.Email,
 			Hash: hashString,
@@ -53,8 +57,9 @@ func (handler *VerifyHandler) Send() http.HandlerFunc {
 			fmt.Println("Ошибка при создании файла")
 			return
 		}
-
-
+		
+		
+		w.WriteHeader(201)
 		fmt.Println("Письмо отправлено")
 	}
 }
