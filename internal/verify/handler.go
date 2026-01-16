@@ -46,7 +46,7 @@ func (handler *VerifyHandler) Send() http.HandlerFunc {
 		}
 		
 		data := VerifyData{
-			Email: handler.Config.Email,
+			Email: body.Email,
 			Hash: hash,
 		}
 		jsonData, err := json.Marshal(data)
