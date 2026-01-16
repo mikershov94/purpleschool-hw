@@ -1,8 +1,6 @@
 package verify
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"go/validation-api/configs"
@@ -33,10 +31,13 @@ func (handler *VerifyHandler) Send() http.HandlerFunc {
 			return 
 		}
 		
-		hash := sha256.Sum256([]byte(body.Email))
-		hashString := hex.EncodeToString(hash[:])
+		hash, err := email.Hash(body.Email)
+		if err != nil {
+			fmt.Println("Ошибка хэширования")
+			return 
+		}
 		
-		err = email.SendLink(handler.Config, body.Email, hashString)
+		err = email.SendLink(handler.Config, body.Email, hash)
 		if err != nil {
 			fmt.Println("Не удалось отправить письмо")
 			fmt.Println(err)
@@ -45,7 +46,7 @@ func (handler *VerifyHandler) Send() http.HandlerFunc {
 		
 		data := VerifyData{
 			Email: handler.Config.Email,
-			Hash: hashString,
+			Hash: hash,
 		}
 		jsonData, err := json.Marshal(data)
 		if err != nil {
