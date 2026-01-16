@@ -14,7 +14,7 @@ func SendLink(config configs.EmailConfig, emailTo string, hash string) error {
 	e.To = []string{"<" + emailTo + ">"}
 	e.Subject = "Michael Ershov"
 	e.Text = []byte("Text Body is, of course, supported!")
-	e.HTML = []byte(fmt.Sprintf(`<a href="http://localhost:3000/verify/%s">http://localhost:3000/verify/%s</a>`, hash, hash))
+	e.HTML = []byte(fmt.Sprintf(`<a href="http://localhost:8081/verify/%s">http://localhost:8081/verify/%s</a>`, hash, hash))
 
 	err := e.Send(config.Address + ":587", smtp.PlainAuth("", config.Email, config.Password, config.Address))
 
