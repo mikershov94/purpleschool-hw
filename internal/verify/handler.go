@@ -6,6 +6,7 @@ import (
 	"go/validation-api/configs"
 	"go/validation-api/pkg/email"
 	"go/validation-api/pkg/req"
+	"go/validation-api/pkg/res"
 	"net/http"
 	"os"
 	"strings"
@@ -72,6 +73,7 @@ func (handler *VerifyHandler) Verify() http.HandlerFunc {
 		verifyData, err := ReadVerifyData(filename)
 		if err != nil {
 			fmt.Println("Ошибка при чтении файла:", err)
+			res.Json(w, false, 503)
 			return
 		}
 
@@ -79,10 +81,22 @@ func (handler *VerifyHandler) Verify() http.HandlerFunc {
 
 		if !email.HashIsValid(verifyData.Hash, target) {
 			fmt.Println("Ошибка верификации")
+			res.Json(w, false, 402)
 			return
+		}
+
+		_, err = os.Stat("verify_data.json")
+		if err == nil {
+			err := os.Remove("verify_data.json")
+			if err != nil {
+				fmt.Println("Ошибка при удалении файла:", err)
+				res.Json(w, false, 503)
+				return
+			}
 		}
 
 		w.WriteHeader(200)
 		fmt.Println("Перешел по ссылке")
+		res.Json(w, true, 200)
 	}
 }
