@@ -11,6 +11,7 @@ import (
 type Config struct {
 	Server ServerConfig
 	Email  EmailConfig
+	Db DbConfig
 }
 
 type ServerConfig struct {
@@ -21,6 +22,10 @@ type EmailConfig struct {
 	Email    string
 	Password string
 	Address  string
+}
+
+type DbConfig struct {
+	Dsn string
 }
 
 func LoadConfig() *Config {
@@ -42,6 +47,9 @@ func LoadConfig() *Config {
 			Email:    os.Getenv("EMAIL"),
 			Password: os.Getenv("PASSWORD"),
 			Address:  os.Getenv("ADDRESS"),
+		},
+		Db: DbConfig{
+			Dsn: os.Getenv("DSN"),
 		},
 	}
 }
