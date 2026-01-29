@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"go/validation-api/configs"
 	"go/validation-api/internal/verify"
+	"go/validation-api/pkg/db"
 	"net/http"
 )
 
 func main() {
 	conf := configs.LoadConfig()
-
+	_ = db.DbConstructor(conf)
 	router := http.NewServeMux()
 	verify.NewVerifyHandler(router, conf.Email)
 
