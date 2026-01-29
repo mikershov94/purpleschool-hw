@@ -7,15 +7,15 @@ import (
 
 type Product struct {
 	gorm.Model
-	Name string
-	Description string
-	Image pq.StringArray
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	Image       pq.StringArray `json:"image" gorm:"type:text[]"`
 }
 
 func ProductConstructor(name string, description string, image pq.StringArray) *Product {
 	return &Product{
-		Name: name,
+		Name:        name,
 		Description: description,
-		Image: image,
+		Image:       image,
 	}
 }
