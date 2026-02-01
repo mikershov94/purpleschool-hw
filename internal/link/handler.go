@@ -8,15 +8,18 @@ import (
 
 type LinkHandlerDeps struct {
 	// Config *configs.Config
+	Repo *LinkRepository
 }
 
 type LinkHandler struct {
 	Config *configs.Config
+	Repo *LinkRepository
 }
 
 func LinkHandlerConstructor(router *http.ServeMux, deps LinkHandlerDeps) {
 	handler := &LinkHandler{
 		// Config: deps.Config,
+		Repo: deps.Repo,
 	}
 
 	router.HandleFunc("POST /link", handler.Create())
