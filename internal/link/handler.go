@@ -21,7 +21,7 @@ func LinkHandlerConstructor(router *http.ServeMux, deps LinkHandlerDeps) {
 	router.HandleFunc("POST /link", handler.Create())
 	router.HandleFunc("PATCH /link/{id}", handler.Update())
 	router.HandleFunc("DELETE /link/{id}", handler.Delete())
-	router.HandleFunc("GET /link/{alias}", handler.Read())
+	router.HandleFunc("GET /link/{alias}", handler.GoTo())
 }
 
 func (handler *LinkHandler) Create() http.HandlerFunc {
@@ -30,7 +30,7 @@ func (handler *LinkHandler) Create() http.HandlerFunc {
 	}
 }
 
-func (handler *LinkHandler) Read() http.HandlerFunc {
+func (handler *LinkHandler) GoTo() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		
 	}
