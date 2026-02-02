@@ -14,8 +14,8 @@ type Link struct {
 
 func LinkConstructor(url string) *Link {
 	return &Link{
-		Url: url,
-		Hash: "",
+		Url:  url,
+		Hash: RandStringRunes(6),
 	}
 }
 
