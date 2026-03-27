@@ -2,6 +2,8 @@ package product
 
 import (
 	"go/validation-api/configs"
+	"go/validation-api/pkg/req"
+	"go/validation-api/pkg/res"
 	"net/http"
 )
 
@@ -21,11 +23,26 @@ func ProductHandlerConstructor(router *http.ServeMux, deps ProductHandlerDeps) {
 		Repo:   deps.Repo,
 	}
 
-	router.HandleFunc("POST /product/create", handler.Create())
+	router.HandleFunc("POST /products", handler.Create())
 }
 
 func (handler *ProductHandler) Create() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {}
+	return func(w http.ResponseWriter, r *http.Request) {
+		body, err := req.HandleBody[ProductCreateRequest](&w, r)
+		if err != nil {
+			return
+		}
+
+		product := ProductConstructor(body.Name, body.Description, body.Image)
+
+		createdProduct, err := handler.Repo.Create(product)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusForbidden)
+			return
+		}
+
+		res.Json(w, createdProduct, 201)
+	}
 }
 
 // Update
