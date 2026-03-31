@@ -16,7 +16,7 @@ type VerifyHandler struct {
 	Config configs.EmailConfig
 }
 
-func NewVerifyHandler(router *http.ServeMux, deps configs.EmailConfig) {
+func VerifyHandlerConstructor(router *http.ServeMux, deps configs.EmailConfig) {
 	handler := &VerifyHandler{
 		Config: deps,
 	}
@@ -29,25 +29,25 @@ func (handler *VerifyHandler) Send() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		body, err := req.HandleBody[SendRequest](&w, r)
 		if err != nil {
-			return 
+			return
 		}
-		
+
 		hash, err := email.Hash(body.Email)
 		if err != nil {
 			fmt.Println("Ошибка хэширования")
-			return 
+			return
 		}
-		
+
 		err = email.SendLink(handler.Config, body.Email, hash)
 		if err != nil {
 			fmt.Println("Не удалось отправить письмо")
 			fmt.Println(err)
 			return
 		}
-		
+
 		data := VerifyData{
 			Email: body.Email,
-			Hash: hash,
+			Hash:  hash,
 		}
 		jsonData, err := json.Marshal(data)
 		if err != nil {
@@ -59,8 +59,7 @@ func (handler *VerifyHandler) Send() http.HandlerFunc {
 			fmt.Println("Ошибка при создании файла")
 			return
 		}
-		
-		
+
 		w.WriteHeader(201)
 		fmt.Println("Письмо отправлено")
 	}

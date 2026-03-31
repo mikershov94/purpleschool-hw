@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"go/validation-api/configs"
+	"go/validation-api/internal/product"
 	"go/validation-api/internal/verify"
 	"go/validation-api/pkg/db"
 	"net/http"
@@ -10,9 +11,16 @@ import (
 
 func main() {
 	conf := configs.LoadConfig()
-	_ = db.DbConstructor(conf)
+	storage := db.DbConstructor(conf)
 	router := http.NewServeMux()
-	verify.NewVerifyHandler(router, conf.Email)
+
+	verify.VerifyHandlerConstructor(router, conf.Email)
+
+	productRepo := product.ProductRepositoryConstructor(storage)
+	product.ProductHandlerConstructor(router, product.ProductHandlerDeps{
+		Config: conf,
+		Repo:   productRepo,
+	})
 
 	port := conf.Server.Port
 	server := http.Server{
