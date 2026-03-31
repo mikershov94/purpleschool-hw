@@ -28,6 +28,7 @@ func ProductHandlerConstructor(router *http.ServeMux, deps ProductHandlerDeps) {
 
 	router.HandleFunc("POST /products", handler.Create())
 	router.HandleFunc("PATCH /products/{id}", handler.Update())
+	router.HandleFunc("DELETE /products/{id}", handler.Delete())
 }
 
 func (handler *ProductHandler) Create() http.HandlerFunc {
@@ -78,5 +79,29 @@ func (handler *ProductHandler) Update() http.HandlerFunc {
 	}
 }
 
-// Delete
+func (handler *ProductHandler) Delete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idString := r.PathValue("id")
+		id, err := strconv.ParseUint(idString, 10, 32)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		_, err = handler.Repo.GetById(uint(id))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+
+		err = handler.Repo.Delete(uint(id))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		res.Json(w, nil, 200)
+	}
+}
+
 // GetById
