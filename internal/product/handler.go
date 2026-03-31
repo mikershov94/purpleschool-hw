@@ -5,6 +5,9 @@ import (
 	"go/validation-api/pkg/req"
 	"go/validation-api/pkg/res"
 	"net/http"
+	"strconv"
+
+	"gorm.io/gorm"
 )
 
 type ProductHandlerDeps struct {
@@ -24,6 +27,7 @@ func ProductHandlerConstructor(router *http.ServeMux, deps ProductHandlerDeps) {
 	}
 
 	router.HandleFunc("POST /products", handler.Create())
+	router.HandleFunc("PATCH /products/{id}", handler.Update())
 }
 
 func (handler *ProductHandler) Create() http.HandlerFunc {
@@ -45,6 +49,34 @@ func (handler *ProductHandler) Create() http.HandlerFunc {
 	}
 }
 
-// Update
+func (handler *ProductHandler) Update() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		body, err := req.HandleBody[ProductUpdateRequest](&w, r)
+		if err != nil {
+			return
+		}
+
+		idString := r.PathValue("id")
+		id, err := strconv.ParseUint(idString, 10, 32)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		product, err := handler.Repo.Update(&Product{
+			Model:       gorm.Model{ID: uint(id)},
+			Name:        body.Name,
+			Description: body.Description,
+			Image:       body.Image,
+		})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		res.Json(w, product, 201)
+	}
+}
+
 // Delete
 // GetById
