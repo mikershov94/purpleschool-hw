@@ -1,6 +1,6 @@
 services:
   postgres:
-    container_name: postgres_go
+    container_name: postgres_go_classwork
     image: postgres:16.4
     environment:
       POSTGRES_USER: postgres
@@ -10,4 +10,4 @@ services:
     volumes:
       - ./postgres-data:/data/postgres
     ports:
-      - "5432:5432"
+      - "5433:5432"
